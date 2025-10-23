@@ -1,0 +1,94 @@
+-- Create Course table
+CREATE TABLE Course (
+    course_id INT PRIMARY KEY,
+    course_name VARCHAR(50)
+);
+
+-- Create Student table
+CREATE TABLE Student (
+    student_id INT PRIMARY KEY,
+    student_name VARCHAR(50),
+    age INT
+);
+
+-- Create Enrollment table (relation between Student & Course)
+CREATE TABLE Enrollment (
+    enroll_id INT PRIMARY KEY,
+    student_id INT,
+    course_id INT
+);
+
+-- Insert data into Course
+INSERT INTO Course VALUES
+(1, 'Java'),
+(2, 'Python'),
+(3, 'C++'),
+(4, 'Web Development');
+
+-- Insert data into Student
+INSERT INTO Student VALUES
+(101, 'Amit', 22),
+(102, 'Sneha', 21),
+(103, 'Ravi', 23),
+(104, 'Neha', 22);
+
+-- Insert data into Enrollment
+INSERT INTO Enrollment VALUES
+(1, 101, 1),
+(2, 102, 2),
+(3, 103, 2),
+(4, 104, 5);  -- Invalid course_id to test joins
+
+----------------------------------------------------------
+-- 1️⃣ INNER JOIN (Only matching Student–Course pairs)
+----------------------------------------------------------
+SELECT s.student_name, c.course_name
+FROM Student s
+INNER JOIN Enrollment e ON s.student_id = e.student_id
+INNER JOIN Course c ON e.course_id = c.course_id;
+
+----------------------------------------------------------
+-- 2️⃣ LEFT JOIN (All students, even if not enrolled properly)
+----------------------------------------------------------
+SELECT s.student_name, c.course_name
+FROM Student s
+LEFT JOIN Enrollment e ON s.student_id = e.student_id
+LEFT JOIN Course c ON e.course_id = c.course_id;
+
+----------------------------------------------------------
+-- 3️⃣ RIGHT JOIN (All courses, even if no students enrolled)
+----------------------------------------------------------
+SELECT s.student_name, c.course_name
+FROM Student s
+RIGHT JOIN Enrollment e ON s.student_id = e.student_id
+RIGHT JOIN Course c ON e.course_id = c.course_id;
+
+----------------------------------------------------------
+-- 4️⃣ FULL OUTER JOIN (All students and all courses)
+----------------------------------------------------------
+SELECT s.student_name, c.course_name
+FROM Student s
+FULL OUTER JOIN Enrollment e ON s.student_id = e.student_id
+FULL OUTER JOIN Course c ON e.course_id = c.course_id;
+
+----------------------------------------------------------
+-- 5️⃣ CROSS JOIN (Every student–course combination)
+----------------------------------------------------------
+SELECT s.student_name, c.course_name
+FROM Student s
+CROSS JOIN Course c;
+
+----------------------------------------------------------
+-- 6️⃣ SELF JOIN (Example: students who are study partners)
+-- Add a column to show partner_id for demo
+----------------------------------------------------------
+ALTER TABLE Student ADD partner_id INT;
+UPDATE Student SET partner_id = 102 WHERE student_id = 101;
+UPDATE Student SET partner_id = 103 WHERE student_id = 102;
+UPDATE Student SET partner_id = NULL WHERE student_id = 103;
+UPDATE Student SET partner_id = 101 WHERE student_id = 104;
+
+SELECT s.student_name AS Student, p.student_name AS Partner
+FROM Student s
+LEFT JOIN Student p
+ON s.partner_id = p.student_id;
